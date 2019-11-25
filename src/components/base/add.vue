@@ -61,10 +61,8 @@
       v-model="isPickType"
       position="right"
       style="width: 50%;height: 100%">
-      <div style="margin: 30px auto;">
-        <mt-button type="primary" plain style="width: 120px;line-height: 30px;margin: 15px 30px;display: block" @click="pickGH">供货</mt-button>
-        <mt-button type="primary" plain style="width: 120px;line-height: 30px;margin: 15px 30px;display: block">采摘</mt-button>
-        <mt-button type="primary" plain style="width: 120px;line-height: 30px;margin: 15px 30px;display: block">盒装</mt-button>
+      <div style="margin: 30px auto;" v-for="item in this.saleTypes">
+        <mt-button type="primary" plain style="width: 120px;line-height: 30px;margin: 15px 30px;display: block" @click="pickSaleType(item)">{{ item.name }}</mt-button>
       </div>
     </mt-popup>
 
@@ -103,6 +101,7 @@
   </div>
 </template>
 <script>
+  import axios from 'axios'
   export default {
     name: 'Index',
     data () {
@@ -128,6 +127,7 @@
         isPickReceipt: false,
         isPickSignature: false,
         yield: '20',
+        saleTypes: [],
         signatures: [
           {
             id: 4,
@@ -169,11 +169,20 @@
         this.isPickDate = true
       },
       pickType () {
+        this.$axios({  //this代表vue对象，之前在入口文件中把axios挂载到了vue中，所以这里直接用this.$axios调用axios对象
+          method: 'get',
+          url: this.HOME + 'dict/query/children/code/CHLX'
+        }).then( res => {
+          console.log(res.data.content)
+          this.saleTypes = res.data.content
+        }).catch(err => {
+          console.log(err);
+        })
         this.isPickType = true
       },
-      pickGH () {
+      pickSaleType(item) {
         this.isPickType = false
-        this.form.saleType = '供货'
+        this.form.saleType = item.name
       },
       pickVariety () {
         this.isPickVariety = true
