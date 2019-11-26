@@ -16,7 +16,7 @@
     <!-- 日期选择 -->
     <div style="margin-top: 20px;">
       <div style="float: left; font-size: 16px;height: 50px">
-        <span style="float: left;display: block" @click="pickDate">{{ year }}年{{ month }}月{{ day }}日<icon name="down" w="16px" h="16px"/></span>
+        <span style="float: left;display: block" @click="pickDate">{{ $moment(showTime).format('YYYY年MM月DD日') }}<icon name="down" w="16px" h="16px"/></span>
         <div style="clear: left"></div>
         <span style="margin-top: 10px; float: left;display: block">收入:{{ income }}元 &nbsp;&nbsp; 产量:{{ yield }} 斤</span>
       </div>
@@ -34,19 +34,19 @@
         infinite-scroll-disabled="loading"
         infinite-scroll-distance="10">
         <div v-for="item in billList">
-          <div style="color: #999999">
+          <div style="color: #999999" @click="showDetail(item)">
             <!-- 供货类型 -->
               <div style="width: 80px;line-height: 60px;font-size: 24px; background-color: #F2F2F2;margin-bottom: 10px;text-align: center; float: left">
-                {{ item.saleType }}
+                {{ item.saleTypeName }}
               </div>
             <!-- 品种，重量，时间 -->
             <div style="float: left; height: 60px; margin-left: 20px;padding-top: 5px">
               <div style="margin-bottom: 10px">
-                <span style="font-size: 18px;margin-right: 10px" > {{ item.variety }}</span>
+                <span style="font-size: 18px;margin-right: 10px" > {{ item.varietyName }}</span>
                 <span> {{ item.weight }}</span> <span> 斤</span>
               </div>
               <div>
-                <span> {{ item.saleTime }} </span>
+                <span> {{ item.createTime }} </span>
               </div>
             </div>
             <!-- 收入 -->
@@ -64,16 +64,14 @@
     </div>
 
     <!-- 日期选择器 -->
-    <mt-popup
-      v-model="isPickDate"
-      position="bottom"
-      style="width: 100%;height: 50%">
-      <div>
-        <span style="float: left;margin-left: 20px;margin-top:20px">取消</span>
-        <span style="float: right;margin-right: 20px;margin-top:20px">确定</span>
-      </div>
-      <mt-picker :slots="slots" visibleItemCount="9" @change="onValuesChange"></mt-picker>
-    </mt-popup>
+    <mt-datetime-picker
+      ref="isPickDate"
+      v-model="showTime"
+      type="date"
+      year-format="{value} 年"
+      month-format="{value} 月"
+      date-format="{value} 日">
+    </mt-datetime-picker>
     <!-- 类型选择器 -->
     <mt-popup
       v-model="isPickType"
@@ -97,6 +95,7 @@ export default {
   name: 'Index',
   data () {
     return {
+      showTime: '',
       year: '2019',
       month: '10',
       day: '1',
@@ -108,50 +107,28 @@ export default {
         {
           id: '1',
           // 出货类型
-          saleType: '供货',
+          saleType: '1',
+          saleTypeName: '供货',
           // 草莓品种
-          variety: '宁玉',
+          variety: '1',
+          varietyName: '宁玉',
+          isMoney: true,
           // 出货斤数
           weight: '5',
+          // 收款方式
+          receiptTypeName: '微信',
           // 出货时间
-          saleTime: '11-01 12:30',
+          createTime: '11-01 12:30',
           // 价钱
-          income: '500'
-
-        },
-        {
-          id: '1',
-          // 出货类型
-          saleType: '盒装',
-          // 草莓品种
-          variety: '红颜',
-          // 出货斤数
-          weight: '5',
-          // 出货时间
-          saleTime: '11-01 12:30',
-          // 价钱
-          income: '500'
-
-        },
-        {
-          id: '1',
-          // 出货类型
-          saleType: '采摘',
-          // 草莓品种
-          variety: '水煮',
-          // 出货斤数
-          weight: '5',
-          // 出货时间
-          saleTime: '11-01 12:30',
-          // 价钱
-          income: '500'
+          income: '500',
+          remark: 'ceshi'
 
         }
       ],
       slots: [
         {
           flex: 1,
-          values: ['2015', '2016', '2017', '2018', '2019', '2020'],
+          values: [],
           className: 'slot1',
           textAlign: 'right'
         }, {
@@ -160,7 +137,7 @@ export default {
           className: 'slot2'
         }, {
           flex: 1,
-          values: ['01', '02', '03', '04', '05', '06'],
+          values: [],
           className: 'slot3'
         }, {
           divider: true,
@@ -168,19 +145,35 @@ export default {
           className: 'slot2'
         }, {
           flex: 1,
-          values: ['01', '02', '03', '04', '05', '06'],
+          values: [],
           className: 'slot3',
           textAlign: 'left'
         }
       ]
     }
   },
+  mounted () {
+    // eslint-disable-next-line no-extend-native
+
+  },
+  created () {
+    this.showTime = new Date()
+    this.year = this.showTime.getFullYear() + ''
+    this.month = this.showTime.getMonth() + ''
+    this.day = this.showTime.getDate() + ''
+  },
   methods: {
     pickDate () {
-      this.isPickDate = true
+      this.$refs.isPickDate.open()
     },
     pickType () {
       this.isPickType = true
+    },
+    showDetail (item) {
+      this.$router.push({
+        path: '/detail',
+        query: item
+      })
     }
   }
 }

@@ -8,6 +8,8 @@ import MintUI from 'mint-ui'
 import 'mint-ui/lib/style.css'
 import Icon from 'vue2-svg-icon/Icon.vue'
 import axios from 'axios'
+import moment from 'moment'
+Vue.prototype.$moment = moment
 Vue.component('icon', Icon)
 Vue.config.productionTip = false
 Vue.use(MintUI)
