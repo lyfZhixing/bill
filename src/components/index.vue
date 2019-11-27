@@ -11,7 +11,7 @@
     </mt-header>
     <!-- 类型选择 -->
     <div>
-      <span style="font-family: 'Microsoft YaHei UI'" @click="pickType">选择类型 <icon name="down" w="16px" h="16px"/></span>
+      <span style="font-family: 'Microsoft YaHei UI'" @click="pickType">{{ saleTypeTitle }} <icon name="down" w="16px" h="16px"/></span>
     </div>
     <!-- 日期选择 -->
     <div style="margin-top: 20px;">
@@ -50,9 +50,12 @@
               </div>
             </div>
             <!-- 收入 -->
-            <div style="float: right;line-height: 60px;margin-right: 20px;font-size: 24px;color: #FF6666;">
+            <div style="float: right;line-height: 60px;margin-right: 20px;font-size: 24px;color: #FF6666;" v-if="item.isMoney">
               <span style="margin-right: 10px">{{ item.income }}</span>
               <span>元</span>
+            </div>
+            <div style="float: right;line-height: 60px;margin-right: 20px;font-size: 16px;color: #FF6666;" v-if="!item.isMoney">
+              <span>{{ item.signatureName }}</span>
             </div>
             <div style="clear: both"/>
             <hr/>
@@ -68,6 +71,7 @@
       ref="isPickDate"
       v-model="showTime"
       type="date"
+      @confirm="pickDateA"
       year-format="{value} 年"
       month-format="{value} 月"
       date-format="{value} 日">
@@ -78,13 +82,11 @@
       position="bottom"
       style="width: 100%;height: 50%">
       <div>
-        <mt-button type="danger" plain style="width: 80px;line-height: 30px;float: left;margin-left: 30px;margin-top: 50px">全部</mt-button>
+        <mt-button type="danger" plain style="width: 80px;line-height: 30px;float: left;margin-left: 30px;margin-top: 50px" @click="pickTypeA('all')">全部</mt-button>
       </div>
       <div style="clear:both"/>
-      <div style="margin: 30px auto;">
-        <mt-button type="primary" plain style="width: 80px;line-height: 30px;float: left;margin-left: 30px">供货</mt-button>
-        <mt-button type="primary" plain style="width: 80px;line-height: 30px;float: left;margin-left: 30px">采摘</mt-button>
-        <mt-button type="primary" plain style="width: 80px;line-height: 30px;float: left;margin-left: 30px">盒装</mt-button>
+      <div style="margin: 30px auto;" v-for="item in saleTypes">
+        <mt-button type="primary" plain style="width: 80px;line-height: 30px;float: left;margin-left: 30px" @click="pickTypeA(item)">{{ item.name }}</mt-button>
       </div>
     </mt-popup>
   </div>
@@ -95,14 +97,17 @@ export default {
   name: 'Index',
   data () {
     return {
+      saleTypes: [],
       showTime: '',
-      year: '2019',
-      month: '10',
-      day: '1',
       isPickDate: false,
       isPickType: false,
-      income: '200',
-      yield: '20',
+      income: '',
+      yield: '',
+      saleTypeTitle: '选择类型',
+      query: {
+        saleType: '',
+        createTime: ''
+      },
       billList: [
         {
           id: '1',
@@ -161,13 +166,57 @@ export default {
     this.year = this.showTime.getFullYear() + ''
     this.month = this.showTime.getMonth() + ''
     this.day = this.showTime.getDate() + ''
+    this.query.createTime = this.$moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+    this.getList()
   },
   methods: {
+    getList () {
+      this.$axios({
+        method: 'get',
+        url: this.HOME + 'bill/list',
+        params: this.query
+      }).then(res => {
+        console.log(res.data.content)
+        this.billList = res.data.content.billVOs
+        this.income = res.data.content.inCome
+        this.yield = res.data.content.weight
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     pickDate () {
       this.$refs.isPickDate.open()
     },
+    pickDateA (date) {
+      this.query.createTime = this.$moment(date).format('YYYY-MM-DD HH:mm:ss')
+      this.getList()
+      this.isPickDate = false
+    },
     pickType () {
+      // this代表vue对象，之前在入口文件中把axios挂载到了vue中，所以这里直接用this.$axios调用axios对象
+      this.$axios({
+        method: 'get',
+        url: this.HOME + 'dict/query/children/code/CHLX'
+      }).then(res => {
+        console.log(res.data.content)
+        this.saleTypes = res.data.content
+      }).catch(err => {
+        console.log(err)
+      })
       this.isPickType = true
+    },
+    pickTypeA (item) {
+      if (item === 'all') {
+        this.saleTypeTitle = '全部'
+        this.query.saleType = ''
+        this.query.createTime = this.$moment(this.showTime).format('YYYY-MM-DD HH:mm:ss')
+      } else {
+        this.query.saleType = item.id
+        this.saleTypeTitle = item.name
+        this.query.createTime = this.$moment(this.showTime).format('YYYY-MM-DD HH:mm:ss')
+      }
+      this.getList()
+      this.isPickType = false
     },
     showDetail (item) {
       this.$router.push({

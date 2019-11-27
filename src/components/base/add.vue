@@ -95,11 +95,11 @@
         <mt-button type="primary" plain style="width: 120px;line-height: 30px;margin: 15px 30px;display: block" @click="pickSignature(item)">{{ item.name }}</mt-button>
       </div>
     </mt-popup>
-
   </div>
 </template>
 <script>
   import axios from 'axios'
+  import { MessageBox } from 'mint-ui'
   export default {
     name: 'Index',
     data () {
@@ -243,9 +243,9 @@
             this.moneyTypeName = '',
             this.receiptTypeName = '',
             this.signatureName = '',
-            alert ('保存成功')
+            MessageBox.alert('保存成功', '提示')
           } else {
-            alert('保存失败')
+            MessageBox.alert('保存失败', '提示')
           }
 
         }).catch(err => {
