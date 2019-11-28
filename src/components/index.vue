@@ -108,28 +108,7 @@ export default {
         saleType: '',
         createTime: ''
       },
-      billList: [
-        {
-          id: '1',
-          // 出货类型
-          saleType: '1',
-          saleTypeName: '供货',
-          // 草莓品种
-          variety: '1',
-          varietyName: '宁玉',
-          isMoney: true,
-          // 出货斤数
-          weight: '5',
-          // 收款方式
-          receiptTypeName: '微信',
-          // 出货时间
-          createTime: '11-01 12:30',
-          // 价钱
-          income: '500',
-          remark: 'ceshi'
-
-        }
-      ],
+      billList: [],
       slots: [
         {
           flex: 1,
