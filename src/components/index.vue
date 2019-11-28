@@ -50,7 +50,7 @@
               </div>
             </div>
             <!-- 收入 -->
-            <div style="float: right;line-height: 60px;margin-right: 20px;font-size: 24px;color: #FF6666;" v-if="item.isMoney">
+            <div style="float: right;line-height: 60px;margin-right: 20px;font-size: 16px;color: #FF6666;" v-if="item.isMoney">
               <span style="margin-right: 10px">{{ item.income }}</span>
               <span>元</span>
             </div>
